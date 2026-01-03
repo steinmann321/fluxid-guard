@@ -1,0 +1,113 @@
+rules:
+  # Existing Playwright strict rules
+  - id: playwright-ban-wait-for-timeout
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.waitForTimeout($DURATION)
+    message: Avoid waitForTimeout; use locator waits + expect.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: playwright-ban-page-pause
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.pause()
+    message: Avoid page.pause in committed tests.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: playwright-discourage-raw-screenshot
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.screenshot($ARGS)
+    message: Use captureScreen(...) helper for consistency.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  # Black-box E2E enforcement: ban non-UI APIs (no URL reliance)
+  - id: e2e-ban-playwright-request
+    languages: [typescript, javascript]
+    patterns:
+      - pattern-either:
+        - pattern: page.request.get($X)
+        - pattern: page.request.post($X)
+        - pattern: page.request.put($X)
+        - pattern: page.request.delete($X)
+        - pattern: page.request.fetch($X)
+        - pattern: request.get($X)
+        - pattern: request.post($X)
+        - pattern: request.put($X)
+        - pattern: request.delete($X)
+        - pattern: request.fetch($X)
+    message: "Black-box E2E: do not use Playwright request APIs."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-fetch-global
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: fetch($X)
+    message: "Black-box E2E: do not use global fetch."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-axios-http
+    languages: [typescript, javascript]
+    patterns:
+      - pattern-either:
+        - pattern: axios($X)
+        - pattern: axios.get($X)
+        - pattern: axios.post($X)
+        - pattern: axios.put($X)
+        - pattern: axios.delete($X)
+    message: "Black-box E2E: do not use axios."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-programmatic-navigation
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: page.goto($X)
+    message: "Black-box E2E: do not use programmatic navigation; navigate via UI."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-network-stubbing
+    languages: [typescript, javascript]
+    patterns:
+      - pattern-either:
+        - pattern: page.route($X)
+        - pattern: context.route($X)
+    message: "Black-box E2E: do not intercept or stub network."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  # Optional cross-framework bans to keep config stack-agnostic
+  - id: e2e-ban-cypress-request-visit
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+        - pattern: cy.request($X)
+        - pattern: cy.visit($X)
+        - pattern: cy.intercept($X)
+    message: "Black-box E2E: do not use Cypress request/visit/intercept."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**

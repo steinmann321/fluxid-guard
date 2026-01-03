@@ -1,0 +1,7 @@
+title = "Gitleaks Security Configuration"
+
+[allowlist]
+description = "Allowlist local dev files"
+paths = [
+  "e2e-tests/test-results/"
+]

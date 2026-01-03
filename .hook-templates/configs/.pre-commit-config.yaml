@@ -1,0 +1,39 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-ast
+      - id: check-json
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-toml
+      - id: debug-statements
+
+  - repo: local
+    hooks:
+      - id: shared-guard
+        name: shared guard — secrets, semgrep, duplication, formatting
+        entry: bash -lc './.hooks/shared-guard.sh'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: frontend-guard
+        name: frontend guard — prod static QA & architecture
+        entry: bash -lc './.hooks/frontend-guard.sh'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: e2e-guard
+        name: e2e guard — Playwright QA
+        entry: bash -lc './.hooks/e2e-guard.sh'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+      - id: backend-guard
+        name: backend guard — fail-fast sequential checks
+        entry: bash -lc './.hooks/backend-guard.sh'
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]

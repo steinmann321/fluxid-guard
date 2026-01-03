@@ -1,0 +1,21 @@
+rules:
+  - id: no-eval
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: eval($X)
+    message: Avoid eval; use safe alternatives.
+    severity: ERROR
+  - id: no-new-function
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: new Function($ARGS)
+    message: Avoid dynamic Function constructors.
+    severity: ERROR
+  - id: no-child-process
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: require('child_process').$METHOD(...)
+          - pattern: import 'child_process'
+    message: Avoid child_process in repo code.
+    severity: ERROR
