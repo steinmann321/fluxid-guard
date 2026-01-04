@@ -1,0 +1,47 @@
+{
+  "name": "shared",
+  "type": "shared",
+  "display_name": "Shared QA Checks",
+  "description": "Universal security, secrets, and code quality checks for all tech stacks",
+
+  "detection": {
+    "always": true
+  },
+
+  "dependencies": {
+    "system": ["git"],
+    "external": ["gitleaks"]
+  },
+
+  "installation": {
+    "config_copies": [
+      {
+        "source": "configs/.pre-commit-config.yaml",
+        "target": ".pre-commit-config.yaml"
+      },
+      {
+        "source": "configs/.gitleaks.toml",
+        "target": ".gitleaks.toml"
+      },
+      {
+        "source": "configs/.jscpdrc",
+        "target": ".jscpdrc"
+      },
+      {
+        "source": "configs/semgrep-base.yml",
+        "target": ".semgrep/base.yml"
+      },
+      {
+        "source": "configs/semgrep-e2e.yml",
+        "target": ".semgrep/e2e.yml"
+      }
+    ]
+  },
+
+  "hooks": [
+    "hooks/shared-guard.sh",
+    "hooks/check-bypass-directives.sh"
+  ],
+
+  "variables": {}
+}

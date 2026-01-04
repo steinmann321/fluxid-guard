@@ -1,0 +1,46 @@
+{
+  "name": "django",
+  "type": "backend",
+  "display_name": "Django Backend",
+  "description": "Enterprise-grade QA enforcement for Django/Python backends",
+
+  "detection": {
+    "directories": ["backend"],
+    "files": ["backend/manage.py"],
+    "package_indicators": {
+      "file": "backend/requirements.txt",
+      "contains": "django"
+    }
+  },
+
+  "dependencies": {
+    "system": ["python3", "pip"],
+    "components": ["shared"]
+  },
+
+  "installation": {
+    "venv_path": "backend/.venv",
+    "requirements_file": "configs/requirements-qa.txt",
+    "config_merges": [
+      {
+        "source": "configs/pyproject-additions.toml",
+        "target": "backend/pyproject.toml",
+        "method": "merge",
+        "create_if_missing": true
+      }
+    ]
+  },
+
+  "hooks": [
+    "hooks/backend-guard.sh",
+    "hooks/backend-max-lines.sh"
+  ],
+
+  "variables": {
+    "backend_port": {
+      "description": "Django dev server port",
+      "default": 8000,
+      "prompt": "Backend API port (Django default)"
+    }
+  }
+}

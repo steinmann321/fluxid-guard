@@ -1,0 +1,14 @@
+{
+  "name": "django-only",
+  "display_name": "Django Backend Only",
+  "description": "QA enforcement for Django backend without frontend or E2E components",
+
+  "components": [
+    "shared",
+    "backend/django"
+  ],
+
+  "configuration": {
+    "backend_port": 8000
+  }
+}

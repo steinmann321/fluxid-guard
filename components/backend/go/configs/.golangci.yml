@@ -1,0 +1,51 @@
+run:
+  timeout: 5m
+  tests: true
+  skip-dirs:
+    - vendor
+    - third_party
+
+linters:
+  enable:
+    - errcheck      # Check for unchecked errors
+    - gosimple      # Simplify code
+    - govet         # Vet examines Go source code and reports suspicious constructs
+    - ineffassign   # Detect ineffectual assignments
+    - staticcheck   # Staticcheck is a go vet on steroids
+    - typecheck     # Type checks
+    - unused        # Checks for unused constants, variables, functions
+    - gofmt         # Check formatting
+    - goimports     # Check imports
+    - misspell      # Check spelling
+    - revive        # Fast, configurable, extensible linter
+    - gosec         # Security problems
+    - goconst       # Repeated strings that could be constants
+    - gocyclo       # Cyclomatic complexity
+    - dupl          # Code duplication
+    - exhaustive    # Check exhaustiveness of enum switch statements
+    - gocritic      # The most opinionated Go linter
+    - godot         # Check comments end in period
+    - prealloc      # Find slice declarations that could pre-allocate
+
+linters-settings:
+  gocyclo:
+    min-complexity: 10
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  revive:
+    severity: error
+    rules:
+      - name: exported
+        severity: error
+      - name: var-naming
+        severity: error
+      - name: indent-error-flow
+        severity: error
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
