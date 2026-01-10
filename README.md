@@ -1,256 +1,422 @@
-# fluxid qa - Modular Code Quality Enforcement System
+# fluxid-guard
 
-A modular, component-based QA enforcement system for multiple tech stacks. Designed for AI-generated codebases with strict anti-cheating directives for LLMs.
+**Enterprise-grade quality enforcement for AI-generated codebases**
 
-## Supported Tech Stacks
+Zero-tolerance QA automation built on pre-commit framework, designed specifically for full-stack Django + React + Playwright projects. Catches common AI-generated code issues before they enter your repository.
 
-### Backend
-- **Django** - Python/Django with mypy strict, ruff, pytest, bandit
-- **Go** - golangci-lint, gosec, 90% coverage, strict formatting
+---
 
-### Frontend
-- **React** - TypeScript, ESLint, 100% type coverage, Vite, Vitest
+## 🚀 Quick Start
 
-### E2E Testing
-- **Playwright** - Anti-flakiness rules, strict locator patterns
-
-### Shared (All Stacks)
-- Gitleaks (secrets detection)
-- Semgrep (security & bug patterns)
-- Code duplication detection
-- Bypass directive enforcement
-
-## Quick Start
-
-### Auto-Detection (Recommended)
-```bash
-./install.sh /path/to/your/project
-```
-
-### Using Presets
-```bash
-# Django + React + Playwright
-./install.sh /path/to/project --preset django-react-playwright
-
-# Django only
-./install.sh /path/to/project --preset django-only
-
-# Go only
-./install.sh /path/to/project --preset go-only
-```
-
-### Manual Component Selection
-```bash
-./install.sh /path/to/project --components backend/go,shared
-```
-
-### List Available Options
-```bash
-./install.sh --list-presets
-./install.sh --list-components
-```
-
-## Project Structure
-
-```
-fluxid-qa/
-├── components/              # Modular QA components
-│   ├── backend/
-│   │   ├── django/         # Django/Python QA
-│   │   │   ├── component.json
-│   │   │   ├── configs/
-│   │   │   └── hooks/
-│   │   └── go/             # Go QA
-│   │       ├── component.json
-│   │       ├── configs/
-│   │       └── hooks/
-│   ├── frontend/
-│   │   └── react/          # React/TypeScript QA
-│   │       ├── component.json
-│   │       ├── configs/
-│   │       └── hooks/
-│   ├── e2e/
-│   │   └── playwright/     # Playwright E2E QA
-│   │       ├── component.json
-│   │       ├── configs/
-│   │       └── hooks/
-│   └── shared/             # Universal checks
-│       ├── component.json
-│       ├── configs/
-│       └── hooks/
-├── lib/                    # Installer modules
-│   ├── logging.sh
-│   ├── component.sh
-│   ├── validation.sh
-│   ├── config.sh
-│   ├── install.sh
-│   └── main.sh
-├── presets/                # Pre-configured stacks
-│   ├── django-react-playwright.json
-│   ├── django-only.json
-│   └── go-only.json
-├── tests/                  # Test suite
-│   ├── unit/
-│   ├── integration/
-│   └── e2e/
-└── install.sh              # Entry point
-```
-
-## Features
-
-### Modular Architecture
-- **Component-based**: Each tech stack is a self-contained component
-- **Composable**: Mix and match components for your stack
-- **Extensible**: Add new tech stacks by creating new components
-- **Auto-detection**: Automatically detects your project structure
-- **Preset system**: Pre-configured for common stacks
-
-### Strict Quality Enforcement
-- **55+ quality rules** across all components
-- **Zero-tolerance** for security issues
-- **90%+ test coverage** requirements
-- **100% type coverage** for TypeScript
-- **Max file line limits** (400 prod, 600 tests)
-- **Anti-bypass directives** for LLMs
-
-### LLM-Optimized Error Messages
-All error messages are designed to prevent AI agents from cheating:
-- Explicit **MANDATORY** and **NEVER** directives
-- Clear decision hierarchies (FIRST/SECOND steps)
-- Warning against common bypass tactics
-- Documented justification requirements for exceptions
-
-## Testing
-
-The project includes a comprehensive test suite with 50+ tests:
+Install all quality checks in one command:
 
 ```bash
-# Run all tests
-./tests/run_tests.sh
-
-# Run specific test suites
-bats tests/unit/         # Fast unit tests
-bats tests/integration/  # Integration tests
-bats tests/e2e/          # Full workflow tests
+# In your Django + React + Playwright project
+make guard PRESET=django-react-playwright-v2
 ```
 
-See [tests/README.md](tests/README.md) for detailed testing documentation.
+**That's it!** The guard system installs 49+ quality rules with automatic dependency management.
 
-## Adding New Tech Stacks
+---
 
-To add support for a new tech stack (e.g., Vue, FastAPI, Cypress):
+## 📋 What Gets Installed (v2 Architecture)
 
-1. **Create component directory**:
-   ```bash
-   mkdir -p components/frontend/vue/{configs,hooks}
-   ```
+### **Core Configs** (pre-commit, gitleaks, semgrep, jscpd)
+- Pre-commit framework with 49+ hooks
+- Secrets detection (gitleaks)
+- Security pattern matching (semgrep)
+- Code duplication detection (jscpd)
 
-2. **Create `component.json`**:
-   ```json
-   {
-     "name": "vue",
-     "type": "frontend",
-     "display_name": "Vue Frontend",
-     "detection": {
-       "files": ["frontend/package.json"],
-       "package_indicators": {
-         "file": "frontend/package.json",
-         "contains": "vue"
-       }
-     },
-     "dependencies": {
-       "system": ["node", "npm"],
-       "components": ["shared"]
-     },
-     "hooks": ["hooks/vue-guard.sh"],
-     "variables": {}
-   }
-   ```
+### **Backend QA** (ruff, mypy, pytest, bandit, vulture, pip-audit)
+Python dependencies installed to `backend/.venv`:
+- **ruff** - Lightning-fast linting & formatting
+- **mypy** - Strict static type checking (100% coverage)
+- **pytest** - Testing with 90% coverage minimum
+- **bandit** - Security vulnerability scanner
+- **vulture** - Dead code detection
+- **pip-audit** - Dependency vulnerability scan
+- **autoflake** - Unused imports/variables removal
+- **xenon** - Cyclomatic complexity limits
+- **import-linter** - Architecture enforcement
+- **semgrep** - Security pattern matching
 
-3. **Create hooks** in `hooks/`:
-   - `vue-guard.sh` - Main QA checks
-   - `vue-max-lines.sh` - Line limit enforcement
+### **Frontend QA** (TypeScript, ESLint, vitest, knip, dependency-cruiser)
+JavaScript dependencies installed to `frontend/node_modules`:
+- **TypeScript** - Type checking with 100% coverage
+- **ESLint** - React/TypeScript linting (max-warnings=0)
+- **vitest** - Testing with 90% coverage minimum
+- **Prettier** - Code formatting
+- **knip** - Unused files/exports detection
+- **ts-unused-exports** - Export usage validation
+- **dependency-cruiser** - Architecture validation
+- **depcheck** - Dependency hygiene
+- **stylelint** - CSS linting
+- **type-coverage** - Type coverage enforcement
 
-4. **Add configs** in `configs/`:
-   - ESLint, TypeScript, test configs, etc.
+### **E2E QA** (Playwright tests, TypeScript checks)
+E2E dependencies installed to `e2e-tests/node_modules`:
+- **Playwright** - Browser automation testing
+- **TypeScript** - Type checking (95% coverage)
+- **ESLint** - Playwright-specific linting
+- **Credentials verification** - Test environment validation
 
-5. **Create preset** (optional):
-   ```json
-   {
-     "name": "django-vue-playwright",
-     "components": ["shared", "backend/django", "frontend/vue", "e2e/playwright"]
-   }
-   ```
+---
 
-6. **Test**:
-   ```bash
-   ./install.sh /path/to/project --components frontend/vue,shared
-   ```
+## 🎯 Complete Rule List (49 Rules in 13 Phases)
 
-## Requirements
+### **Phase 1: Fast Checks + Security** (0-2 sec)
+1. ✓ Python syntax validation (AST)
+2. ✓ JSON/YAML/TOML validation
+3. ✓ Debug statements blocking (`console.log`, `pdb`)
+4. ✓ Whitespace/EOF normalization
+5. ✓ **Secrets detection** (API keys, passwords, tokens)
 
-- **Git** - Project must be a git repository
-- **jq** - JSON parsing (install: `brew install jq` / `apt install jq`)
-- **Python 3.11+** - For Django/Python components
-- **Go 1.21+** - For Go components
-- **Node.js 18+** - For frontend/E2E components
+### **Phase 2: Formatting** (2-5 sec)
+6. ✓ Python formatting (ruff)
+7. ✓ Frontend formatting (prettier)
+8. ✓ E2E formatting (prettier)
 
-## How It Works
+### **Phase 3: Dead Code Elimination** (5-10 sec)
+9. ✓ Python dead code (vulture)
+10. ✓ Python unused imports/variables (autoflake)
+11. ✓ Frontend unused files (knip)
+12. ✓ Frontend unused exports (ts-unused-exports)
 
-1. **Detection**: Scans target project for tech stack indicators
-2. **Validation**: Checks system dependencies for selected components
-3. **Configuration**: Prompts for ports and other variables
-4. **Installation**:
-   - Copies hook scripts (read-only for security)
-   - Copies/merges config files
-   - Installs QA tools (venv for Python, go install for Go, npm for Node)
-5. **Pre-commit setup**: Installs pre-commit framework
+### **Phase 4: Dependency Security** (10-15 sec)
+13. ✓ **Python vulnerability scan** (pip-audit)
+14. ✓ **JavaScript vulnerability scan** (npm audit)
+15. ✓ Dependency hygiene (depcheck)
 
-## Detailed Documentation
+### **Phase 5: File Size Limits** (15-20 sec)
+16. ✓ Backend max 400 lines (600 for tests)
+17. ✓ Frontend max 400 lines (600 for tests)
+18. ✓ E2E max 600 lines
 
-See [README-HOOKS.md](./README-HOOKS.md) for:
-- Complete enforcement rules list
-- Tool-by-tool breakdown
-- Bypass directive philosophy
-- Troubleshooting guide
-- Uninstallation instructions
+### **Phase 6: Linting + Constants** (20-30 sec)
+19. ✓ **Backend constants enforcement** (no hardcoded URLs/ports)
+20. ✓ Backend linting (ruff - 1000+ rules)
+21. ✓ **Bypass directive blocking** (no `# noqa`, `# type: ignore`)
+22. ✓ **Frontend constants enforcement** (semgrep)
+23. ✓ Frontend linting (ESLint - max-warnings=0)
+24. ✓ CSS linting (stylelint)
+25. ✓ **E2E constants enforcement** (semgrep)
+26. ✓ E2E linting (ESLint with Playwright rules)
 
-## Design Philosophy
+### **Phase 7: Type Safety** (30-50 sec)
+27. ✓ **Backend strict typing** (mypy --strict, 100%)
+28. ✓ **Frontend TypeScript** (100% type coverage)
+29. ✓ Frontend type coverage enforcement
+30. ✓ **E2E TypeScript** (95% type coverage)
+31. ✓ E2E type coverage enforcement
 
-### For AI-Generated Code
-This system is built specifically for codebases where LLMs generate significant code:
-- **Strict by default**: No configuration needed for high standards
-- **Anti-cheating**: Error messages prevent LLMs from bypassing checks
-- **Comprehensive**: Covers security, types, tests, architecture, duplication
-- **Fail-fast**: Issues caught immediately, not in production
+### **Phase 8: Complexity + Architecture** (50-70 sec)
+32. ✓ Backend complexity limits (xenon - max B)
+33. ✓ Backend import boundaries (import-linter)
+34. ✓ Frontend architecture validation (dependency-cruiser)
 
-### For Human Developers
-- **Clear errors**: Know exactly what to fix and why
-- **Fast feedback**: Most checks complete in seconds
-- **Modular**: Only install what you need
-- **Documented**: Every rule has a clear purpose
+### **Phase 9: Framework-Specific** (70-80 sec)
+35. ✓ **Django system checks** (models, settings, security)
+36. ✓ **Django migrations validation**
+37. ✓ **Backend security scan** (bandit - SQL injection, etc.)
+38. ✓ E2E credentials verification
+39. ✓ Fixture enforcement (migration-based only)
 
-## CI/CD Integration
+### **Phase 10: Code Duplication** (80-90 sec)
+40. ✓ Frontend + E2E duplication detection (jscpd)
+41. ✓ E2E standalone duplication check
 
-Tests run automatically on GitHub Actions:
-- Push to main/develop branches
-- Pull requests
+### **Phase 11: Test Coverage** (90-150 sec)
+42. ✓ Backend TDD markers enforcement
+43. ✓ **Backend test coverage** (pytest - 90% min, branch coverage)
+44. ✓ **Frontend test coverage** (vitest - 90% min)
 
-See `.github/workflows/test.yml` for configuration.
+### **Phase 12: Build Verification** (150-180 sec)
+45. ✓ **Frontend production build** (Vite - tree-shaking, optimization)
 
-## License
+### **Phase 13: E2E Testing** (180-240 sec)
+46. ✓ **Full E2E test suite** (Playwright - max-failures=1)
 
-MIT
+---
 
-## Contributing
+## 📦 Prerequisites
 
-To add new components:
-1. Follow the component structure above
-2. Use LLM-optimized error messages
-3. Write tests (see tests/README.md)
-4. Test with actual projects
-5. Submit PR with preset examples
+Your project structure should have:
+```
+your-project/
+├── backend/          # Django app
+│   ├── manage.py
+│   └── requirements.txt
+├── frontend/         # React + Vite + TypeScript
+│   ├── package.json
+│   └── src/
+├── e2e-tests/        # Playwright tests
+│   ├── package.json
+│   └── tests/
+└── Makefile          # With guard target
+```
 
-## Support
+**Required tools:**
+- Python 3.13+
+- Node.js 22+
+- Git
+- Make
 
-For issues or questions, open a GitHub issue at https://github.com/steinmann321/fluxid-qa
+---
+
+## 🔧 Installation
+
+### Step 1: Add Guard Target to Makefile
+
+```makefile
+# fluxid guard configuration
+FLUXID_GUARD_REPO := https://github.com/steinmann321/fluxid-guard.git
+
+guard:
+	@if [ -z "$(PRESET)" ]; then \
+		echo "[MAKE] ERROR: PRESET parameter is required"; \
+		echo "[MAKE] Usage: make guard PRESET=<preset-name>"; \
+		exit 1; \
+	fi
+	@echo "[MAKE] Cloning fluxid guard from GitHub..."
+	@TEMP_DIR=$$(mktemp -d) && \
+		git clone --quiet $(FLUXID_GUARD_REPO) "$$TEMP_DIR" && \
+		echo "[MAKE] Installing fluxid guard with preset: $(PRESET)" && \
+		cd "$$TEMP_DIR" && \
+		echo "y" | ./install.sh $(CURDIR) --preset $(PRESET) && \
+		cd $(CURDIR) && \
+		rm -rf "$$TEMP_DIR" && \
+		echo "[MAKE] fluxid guard installation complete"
+```
+
+### Step 2: Install Dependencies
+
+```bash
+# Install your app dependencies first
+make setup  # or npm install, pip install, etc.
+```
+
+### Step 3: Install Guard System
+
+```bash
+# Install all QA rules (one command, fully automated)
+make guard PRESET=django-react-playwright-v2
+```
+
+**What happens:**
+1. Clones fluxid-guard from GitHub to temporary directory
+2. Installs 100+ Python QA dependencies to `backend/.venv`
+3. Installs frontend/E2E QA dependencies to `node_modules`
+4. Configures pre-commit hooks (`.pre-commit-config.yaml`)
+5. Sets up configs (`.gitleaks.toml`, `.jscpdrc`, `.semgrep/`)
+6. Cleans up temporary files
+
+---
+
+## 🎮 Usage
+
+### Run All Quality Checks
+
+```bash
+# Run all 49 rules before committing
+pre-commit run --all-files
+```
+
+### Automatic on Git Commit
+
+```bash
+# Hooks run automatically on every commit
+git add .
+git commit -m "Add new feature"
+# → All 49 rules execute, fail-fast on first error
+```
+
+### Run Individual Tools
+
+```bash
+# Backend tools (from project root)
+backend/.venv/bin/ruff check backend
+backend/.venv/bin/mypy --strict backend
+backend/.venv/bin/pytest --cov=backend --cov-fail-under=90
+
+# Frontend tools
+cd frontend && npm run lint
+cd frontend && npm run type-check
+cd frontend && npm run test:coverage
+
+# E2E tools
+cd e2e-tests && npx playwright test
+```
+
+---
+
+## 📖 Available Presets
+
+| Preset | Description | Components |
+|--------|-------------|------------|
+| `django-react-playwright-v2` | Full-stack (recommended) | Backend, Frontend, E2E, Configs |
+| `django-react-playwright` | Full-stack (legacy) | Older architecture |
+| `django-only` | Backend only | Django + Python QA |
+| `go-only` | Go backend | Go + QA tools |
+
+---
+
+## 🔍 Example Output
+
+```bash
+$ git commit -m "Add user authentication"
+
+check python ast.........................................................Passed
+check json...............................................................Passed
+shared — secrets detection...............................................Passed
+backend — format check...................................................Passed
+backend — dead code detection............................................Passed
+backend — dependency vulnerability scan..................................Passed
+backend — max lines (400 prod, 600 tests)...............................Passed
+backend — ruff lint......................................................Passed
+backend — mypy strict type check.........................................Passed
+backend — complexity check...............................................Passed
+backend — django system checks...........................................Passed
+backend — security scan..................................................Passed
+backend — test coverage (90% min)........................................Passed
+frontend — prettier format check.........................................Passed
+frontend — unused files check............................................Passed
+frontend — security audit................................................Passed
+frontend — eslint........................................................Passed
+frontend — typescript typecheck..........................................Passed
+frontend — type coverage (100%).........................................Passed
+frontend — architecture validation.......................................Passed
+frontend — test coverage (90%)..........................................Passed
+frontend — production build..............................................Passed
+e2e — eslint............................................................Passed
+e2e — typescript typecheck...............................................Passed
+e2e — playwright tests...................................................Passed
+
+[main abc1234] Add user authentication
+ 15 files changed, 450 insertions(+), 20 deletions(-)
+```
+
+---
+
+## 🛡️ Security Features
+
+- **Secrets Detection**: Scans for API keys, passwords, tokens (gitleaks)
+- **Vulnerability Scanning**: Checks Python (pip-audit) and JavaScript (npm audit) dependencies
+- **Security Patterns**: Detects SQL injection, XSS, insecure functions (bandit, semgrep)
+- **Bypass Prevention**: Blocks attempts to disable checks (`# noqa`, `type: ignore`)
+- **Constants Enforcement**: Prevents hardcoded credentials, URLs, ports
+
+---
+
+## 🏗️ Architecture (v2)
+
+The v2 architecture uses **pre-commit framework** exclusively:
+
+```
+.pre-commit-config.yaml    # 49 hooks in 13 phases
+.hooks/                    # Custom hook scripts (read-only)
+├── backend-max-lines.sh
+├── check-bypass-directives.sh
+└── frontend-max-lines.sh
+
+.gitleaks.toml            # Secrets detection config
+.jscpdrc                  # Code duplication config
+.semgrep/                 # Security pattern rules
+├── backend.yml
+├── frontend.yml
+└── e2e.yml
+
+backend/.venv/            # Python QA tools
+├── bin/ruff
+├── bin/mypy
+├── bin/pytest
+├── bin/bandit
+└── ...
+
+frontend/node_modules/    # Frontend QA tools
+e2e-tests/node_modules/   # E2E QA tools
+```
+
+**Key Differences from v1:**
+- ✅ Pre-commit framework handles all orchestration
+- ✅ No separate "guard" scripts
+- ✅ Phased execution (fail-fast)
+- ✅ Shared configs across all components
+- ✅ Integrated into existing venvs/node_modules
+
+---
+
+## 🔄 Re-installation / Updates
+
+```bash
+# Update to latest version
+make guard PRESET=django-react-playwright-v2
+
+# Switch to different preset
+make guard PRESET=django-only
+
+# The installer handles cleanup and reconfiguration automatically
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: "No module named 'ruff'"
+**Solution**: Run `make setup` first to create `backend/.venv`, then run `make guard`
+
+### Issue: Pre-commit hook fails on first run
+**Solution**: First run installs pre-commit environments. Run again:
+```bash
+pre-commit run --all-files
+```
+
+### Issue: "PRESET parameter is required"
+**Solution**: Always specify preset:
+```bash
+make guard PRESET=django-react-playwright-v2
+```
+
+### Issue: Hooks take too long
+**Solution**: Hooks cache results. Subsequent runs are much faster. To skip on CI:
+```bash
+SKIP=frontend-vite-build,e2e-playwright git commit -m "..."
+```
+
+---
+
+## 📚 Philosophy
+
+**Built for AI-Generated Code:**
+- LLMs like Claude generate significant portions of modern codebases
+- AI code needs stricter enforcement to catch common patterns
+- Zero-tolerance policy prevents gradual quality degradation
+- Fail-fast feedback helps AI learn correct patterns
+
+**Why Strict Rules?**
+- Prevents technical debt accumulation
+- Catches issues before code review
+- Enforces best practices automatically
+- Creates consistent, maintainable codebase
+
+---
+
+## 🤝 Contributing
+
+Issues and PRs welcome at: https://github.com/steinmann321/fluxid-guard
+
+---
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+## 🔗 Related Projects
+
+- **Bootstrap Template**: https://github.com/steinmann321/django-react-playwright-template
+- **Scaffold with Guard**: Complete starter with fluxid-guard pre-configured
+
+---
+
+**Built with ❤️ for AI-assisted development**
