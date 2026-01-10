@@ -120,16 +120,17 @@ install_backend_component() {
     local name=$(echo "$metadata" | /opt/homebrew/bin/jq -r '.name')
 
     case "$name" in
-        django)
-            install_django
+        django|django-v2)
+            install_django "$component_dir"
             ;;
-        go)
+        go|go-v2)
             install_go
             ;;
     esac
 }
 
 install_django() {
+    local component_dir=$1
     log_info "Setting up Django/Python environment..."
 
     cd "$TARGET_DIR/backend"
@@ -149,7 +150,7 @@ install_django() {
 
     # Install QA dependencies
     log_info "Installing Django QA dependencies..."
-    "$venv_pip" install -r "$COMPONENTS_DIR/backend/django/configs/requirements-qa.txt"
+    "$venv_pip" install -r "$component_dir/configs/requirements-qa.txt"
 
     log_success "Django QA tools installed"
 }

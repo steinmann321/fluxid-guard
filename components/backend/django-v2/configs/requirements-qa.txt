@@ -1,0 +1,32 @@
+# Linting & Formatting
+ruff==0.14.4
+
+# Type Checking
+mypy==1.18.2
+django-stubs==5.2.7
+
+# Testing
+pytest==7.4.4
+pytest-django==4.9.0
+pytest-cov==5.0.0
+
+# Security
+bandit==1.8.6
+pip-audit==2.8.0
+
+# Code Quality
+xenon==0.9.3
+vulture==2.14
+autoflake==2.3.1
+
+# Architecture
+import-linter==1.12.1
+
+# Static Analysis
+semgrep==1.146.0
+
+# Pre-commit
+pre-commit==4.0.1
+
+# Performance
+nplusone==1.0.0
