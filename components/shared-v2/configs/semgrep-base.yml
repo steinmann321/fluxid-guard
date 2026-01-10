@@ -1,0 +1,11 @@
+rules:
+  - id: python.no-blanket-excepts
+    patterns:
+      - pattern: |
+          try:
+            ...
+          except:
+            ...
+    message: Avoid bare except; catch specific exceptions.
+    languages: [python]
+    severity: WARNING

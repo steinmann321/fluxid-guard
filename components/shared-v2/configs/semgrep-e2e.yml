@@ -1,0 +1,7 @@
+rules:
+  - id: playwright.no-timeout-sleeps
+    pattern: |
+      page.waitForTimeout(...)
+    message: Avoid waitForTimeout; use locator-based waits.
+    languages: [typescript]
+    severity: ERROR

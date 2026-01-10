@@ -1,0 +1,3 @@
+title = "FluxID v2 gitleaks"
+[allowlist]
+paths = ["e2e-tests/test-results/", "node_modules/"]
