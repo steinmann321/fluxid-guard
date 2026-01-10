@@ -264,17 +264,6 @@ cd e2e-tests && npx playwright test
 
 ---
 
-## Available Presets
-
-| Preset | Description | Components |
-|--------|-------------|------------|
-| `django-react-playwright-v2` | Full-stack (recommended) | Backend, Frontend, E2E, Configs |
-| `django-react-playwright` | Full-stack (legacy) | Older architecture |
-| `django-only` | Backend only | Django + Python QA |
-| `go-only` | Go backend | Go + QA tools |
-
----
-
 ## Example Output
 
 ```bash
@@ -351,13 +340,6 @@ frontend/node_modules/    # Frontend QA tools
 e2e-tests/node_modules/   # E2E QA tools
 ```
 
-**Key Differences from v1:**
-- Pre-commit framework handles all orchestration
-- No separate "guard" scripts
-- Phased execution (fail-fast)
-- Shared configs across all components
-- Integrated into existing venvs/node_modules
-
 ---
 
 ## Re-installation / Updates
@@ -377,31 +359,6 @@ make guard PRESET=django-react-playwright-v2
 To switch presets, just specify a different preset:
 ```bash
 ./install.sh /path/to/your/project --preset django-only
-```
-
----
-
-## Troubleshooting
-
-### Issue: "No module named 'ruff'"
-**Solution**: Run `make setup` first to create `backend/.venv`, then run `make guard`
-
-### Issue: Pre-commit hook fails on first run
-**Solution**: First run installs pre-commit environments. Run again:
-```bash
-pre-commit run --all-files
-```
-
-### Issue: "PRESET parameter is required"
-**Solution**: Always specify preset:
-```bash
-make guard PRESET=django-react-playwright-v2
-```
-
-### Issue: Hooks take too long
-**Solution**: Hooks cache results. Subsequent runs are much faster. To skip on CI:
-```bash
-SKIP=frontend-vite-build,e2e-playwright git commit -m "..."
 ```
 
 ---
@@ -436,8 +393,8 @@ MIT License - See LICENSE file for details
 
 ## Related Projects
 
-- **Bootstrap Template**: https://github.com/steinmann321/django-react-playwright-template
-- **Scaffold with Guard**: Complete starter with fluxid-guard pre-configured
+- **Django + React + Playwright Template**: https://github.com/steinmann321/django-react-playwright-template
+  Complete starter with fluxid-guard installer preconfigured. Install QA enforcement with one command: `make guard PRESET=django-react-playwright-v2`
 
 ---
 
