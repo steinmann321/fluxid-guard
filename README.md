@@ -1,8 +1,8 @@
 # fluxid-guard
 
-**Enterprise-grade quality enforcement for AI-generated codebases**
+**Quality enforcement for AI-generated codebases**
 
-Zero-tolerance QA automation built on pre-commit framework, designed specifically for full-stack Django + React + Playwright projects. Catches common AI-generated code issues before they enter your repository.
+QA automation built on pre-commit framework, designed for full-stack Django + React + Playwright projects. Catches common AI-generated code issues before they enter your repository.
 
 ---
 
@@ -29,7 +29,7 @@ The guard system installs 49+ quality rules with automatic dependency management
 
 ### Backend QA (ruff, mypy, pytest, bandit, vulture, pip-audit)
 Python dependencies installed to `backend/.venv`:
-- **ruff** - Lightning-fast linting & formatting
+- **ruff** - Linting & formatting
 - **mypy** - Strict static type checking (100% coverage)
 - **pytest** - Testing with 90% coverage minimum
 - **bandit** - Security vulnerability scanner
@@ -388,8 +388,8 @@ SKIP=frontend-vite-build,e2e-playwright git commit -m "..."
 
 **Built for AI-Generated Code:**
 - LLMs like Claude generate significant portions of modern codebases
-- AI code needs stricter enforcement to catch common patterns
-- Zero-tolerance policy prevents gradual quality degradation
+- AI code benefits from automated checks to catch common patterns
+- Strict enforcement helps maintain code quality
 - Fail-fast feedback helps AI learn correct patterns
 
 **Why Strict Rules?**

@@ -30,9 +30,9 @@ log_error() {
 print_header() {
     printf "\n"
     printf "${CYAN}╔══════════════════════════════════════════════════════════════════════╗${NC}\n"
-    printf "${CYAN}║${NC}   ${BOLD}${MAGENTA}fluxid qa - Modular Component System${NC}                         ${CYAN}║${NC}\n"
+    printf "${CYAN}║${NC}   ${BOLD}${MAGENTA}fluxid guard - Modular Component System${NC}                      ${CYAN}║${NC}\n"
     printf "${CYAN}║${NC}                                                                      ${CYAN}║${NC}\n"
-    printf "${CYAN}║${NC}        ${GREEN}Enterprise-Grade QA for Multiple Tech Stacks${NC}             ${CYAN}║${NC}\n"
+    printf "${CYAN}║${NC}        ${GREEN}Quality Enforcement for Multiple Tech Stacks${NC}             ${CYAN}║${NC}\n"
     printf "${CYAN}╚══════════════════════════════════════════════════════════════════════╝${NC}\n"
     printf "\n"
 }
@@ -82,7 +82,7 @@ print_success_footer() {
     printf "\n"
     printf "${GREEN}╔══════════════════════════════════════════════════════════════════════╗${NC}\n"
     printf "${GREEN}║${NC}                                                                      ${GREEN}║${NC}\n"
-    printf "${GREEN}║${NC}     ${BOLD}${GREEN}✓${NC} ${BOLD}Enterprise-Grade QA Enforcement Activated!${NC}                  ${GREEN}║${NC}\n"
+    printf "${GREEN}║${NC}     ${BOLD}${GREEN}✓${NC} ${BOLD}QA Enforcement Activated${NC}                                     ${GREEN}║${NC}\n"
     printf "${GREEN}║${NC}                                                                      ${GREEN}║${NC}\n"
     printf "${GREEN}╚══════════════════════════════════════════════════════════════════════╝${NC}\n"
     printf "\n"
