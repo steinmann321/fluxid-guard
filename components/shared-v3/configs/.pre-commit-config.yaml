@@ -1,0 +1,365 @@
+# Fail-fast at hook level (not guard level)
+fail_fast: true
+
+repos:
+  # ========================================================================
+  # PHASE 1: Fast Syntactic Checks + Critical Security (0-2 sec)
+  # ========================================================================
+  # Run pre-commit builtins and gitleaks first: fastest checks, critical results
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-ast
+      - id: check-json
+      - id: check-yaml
+        args: [--unsafe]
+      - id: check-toml
+      - id: debug-statements
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+
+  - repo: local
+    hooks:
+      - id: gitleaks
+        name: shared — secrets detection
+        entry: bash -c 'gitleaks detect --redact --config .gitleaks.toml --log-level=error --no-banner'
+        language: system
+        pass_filenames: false
+
+  # ========================================================================
+  # PHASE 2: Formatting (2-5 sec)
+  # ========================================================================
+  # Normalize code before analysis to ensure accurate linting/duplication checks
+      - id: backend-ruff-format
+        name: backend — format check
+        entry: bash -c 'backend/.venv/bin/ruff format --check backend --quiet'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: prettier-frontend
+        name: shared — prettier format check (frontend)
+        entry: bash -c './frontend/node_modules/.bin/prettier --check "frontend/src/**/*.{ts,tsx,css}"'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx|css)$'
+
+      - id: prettier-e2e
+        name: shared — prettier format check (e2e)
+        entry: bash -c './frontend/node_modules/.bin/prettier --check "e2e-tests/**/*.{ts,tsx,js}"'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx|js)$'
+
+  # ========================================================================
+  # PHASE 3: Code Elimination - ALL Projects (5-10 sec)
+  # ========================================================================
+  # Remove dead code before expensive linting/complexity analysis
+  # Process all projects together: backend vulture/autoflake + frontend knip/unused-exports
+      - id: backend-vulture
+        name: backend — dead code detection
+        entry: bash -c 'cd backend && .venv/bin/vulture .'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+        exclude: '^backend/(\.venv|migrations|__pycache__)/'
+
+      - id: backend-autoflake
+        name: backend — unused imports/variables
+        entry: bash -c 'backend/.venv/bin/autoflake --check --recursive --remove-all-unused-imports --remove-unused-variables --exclude=__pycache__,.venv,migrations backend'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: frontend-knip
+        name: frontend — unused files check
+        entry: bash -c 'cd frontend && ./node_modules/.bin/knip --strict'
+        language: system
+        pass_filenames: false
+        files: '^frontend/.*\.(ts|tsx)$'
+
+      - id: frontend-ts-unused-exports
+        name: frontend — unused exports check
+        entry: bash -c 'cd frontend && ./node_modules/.bin/ts-unused-exports tsconfig.app.json --showLineNumber --exitWithCount --excludePathsFromReport="src/main.tsx"'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.ts$'
+
+  # ========================================================================
+  # PHASE 4: Dependency Audits (10-15 sec)
+  # ========================================================================
+  # Security audits don't depend on code structure - fail fast on vulnerable deps
+      - id: backend-pip-audit
+        name: backend — dependency vulnerability scan
+        entry: bash -c 'backend/.venv/bin/pip-audit'
+        language: system
+        pass_filenames: false
+        # Run always (checks installed packages, not specific files)
+
+      - id: frontend-npm-audit
+        name: frontend — security audit
+        entry: bash -c 'cd frontend && npm audit --audit-level=moderate'
+        language: system
+        pass_filenames: false
+        files: '^frontend/package(-lock)?\.json$'
+
+      - id: frontend-depcheck
+        name: frontend — dependency hygiene
+        entry: bash -c 'cd frontend && ./node_modules/.bin/depcheck --ignores "@tailwindcss/postcss,autoprefixer,dependency-cruiser,depcheck,eslint-formatter-unix,jscpd,jsdom,knip,postcss,prettier,prettier-plugin-organize-imports,prettier-plugin-tailwindcss,stylelint,stylelint-config-standard,tailwindcss,ts-unused-exports,type-coverage,vitest,vitest-axe,@vitest/ui,@vitest/coverage-v8,@testing-library/react,@testing-library/jest-dom,@testing-library/user-event"'
+        language: system
+        pass_filenames: false
+        files: '^frontend/package\.json$'
+
+  # ========================================================================
+  # PHASE 5: Simple Metrics (15-20 sec)
+  # ========================================================================
+  # Quick structural checks before expensive analysis
+      - id: backend-max-lines
+        name: backend — max lines (400 prod, 600 tests)
+        entry: bash -c './.hooks/backend-max-lines.sh'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+        exclude: '^backend/migrations/'
+
+      - id: frontend-max-lines
+        name: frontend — max lines (400 prod, 600 tests)
+        entry: bash -c './.hooks/frontend-max-lines.sh'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx)$'
+
+      - id: e2e-max-lines
+        name: "e2e — max lines (600)"
+        entry: "bash -c 'FILES=$(find e2e-tests/tests -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\)); for f in $FILES; do lines=$(wc -l < \"$f\" | tr -d \"[:space:]\"); if [ \"$lines\" -gt 600 ]; then echo \"Error: $f exceeds limit (600 lines)\" >&2; exit 1; fi; done'"
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/tests/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 6: Linting + Constants (20-30 sec)
+  # ========================================================================
+  # Constants enforcement - run sequentially by project (fail_fast stops on first failure)
+      - id: semgrep-backend
+        name: backend — constants enforcement
+        entry: bash -c 'backend/.venv/bin/semgrep scan --config .semgrep/backend.yml backend --error'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: semgrep-frontend
+        name: frontend — constants enforcement
+        entry: bash -c 'backend/.venv/bin/semgrep scan --config .semgrep/frontend.yml frontend/src --error'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx)$'
+
+      - id: semgrep-e2e
+        name: e2e — constants enforcement
+        entry: bash -c 'backend/.venv/bin/semgrep scan --config .semgrep/e2e.yml e2e-tests --error'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx)$'
+
+      - id: backend-ruff-lint
+        name: backend — ruff lint
+        entry: bash -c 'backend/.venv/bin/ruff check backend --output-format=concise'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: backend-bypass-directives
+        name: backend — bypass directive enforcement
+        entry: bash -c './.hooks/check-bypass-directives.sh'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: frontend-eslint
+        name: frontend — eslint
+        entry: bash -c 'cd frontend && ./node_modules/.bin/eslint -f unix . --max-warnings=0'
+        language: system
+        pass_filenames: false
+        files: '^frontend/.*\.(ts|tsx)$'
+
+      - id: frontend-stylelint
+        name: frontend — css linting
+        entry: bash -c 'cd frontend && ./node_modules/.bin/stylelint "src/**/*.css" --ignore-path .stylelintignore --allow-empty-input'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.css$'
+
+      - id: e2e-eslint
+        name: e2e — eslint
+        entry: bash -c 'cd e2e-tests && ./node_modules/.bin/eslint -f unix . --max-warnings=0'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 7: Type Checking (30-50 sec)
+  # ========================================================================
+  # Validate type correctness after formatting and linting
+      - id: backend-mypy
+        name: backend — mypy strict type check
+        entry: bash -c 'backend/.venv/bin/mypy --strict backend'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: frontend-tsc
+        name: frontend — typescript typecheck
+        entry: bash -c 'cd frontend && ./node_modules/.bin/tsc -b --noEmit'
+        language: system
+        pass_filenames: false
+        files: '^frontend/.*\.(ts|tsx)$'
+
+      - id: frontend-type-coverage
+        name: frontend — type coverage (100%)
+        entry: bash -c 'cd frontend && ./node_modules/.bin/type-coverage --project tsconfig.app.json --strict --detail --ignore-files "**/*.test.*" "**/*.spec.*" --target 100 --cache-directory ../.tmp/type-coverage/frontend'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx)$'
+
+      - id: e2e-tsc
+        name: e2e — typescript typecheck
+        entry: bash -c 'cd e2e-tests && ./node_modules/.bin/tsc --noEmit'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx)$'
+
+      - id: e2e-type-coverage
+        name: e2e — type coverage (95%)
+        entry: bash -c 'cd e2e-tests && ./node_modules/.bin/type-coverage --at-least 95 --strict --detail --cache-directory ../.tmp/type-coverage/e2e'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 8: Complexity + Architecture (50-70 sec)
+  # ========================================================================
+  # Structural analysis after type checking validates structure
+      - id: backend-xenon
+        name: backend — complexity check
+        entry: bash -c 'backend/.venv/bin/xenon --max-absolute B --max-modules B --max-average A --exclude backend/.venv,backend/migrations backend'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: backend-import-linting
+        name: backend — import linting
+        entry: bash -c 'cd backend && ./.venv/bin/lint-imports'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: frontend-depcruise
+        name: frontend — architecture validation
+        entry: bash -c 'cd frontend && ./node_modules/.bin/depcruise --config ./.dependency-cruiser.cjs ./src'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 9: Framework-Specific Checks (70-80 sec)
+  # ========================================================================
+  # Framework and security checks after code quality verified
+      - id: backend-django-checks
+        name: backend — django system checks
+        entry: bash -c 'backend/.venv/bin/python backend/manage.py check --fail-level WARNING'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: backend-migrations-check
+        name: backend — migrations check
+        entry: bash -c 'backend/.venv/bin/python backend/manage.py makemigrations --check --dry-run'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*(models|admin)\.py$'
+
+      - id: backend-bandit
+        name: backend — security scan
+        entry: bash -c 'backend/.venv/bin/bandit -r backend -ll --exclude backend/.venv'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: e2e-credentials
+        name: e2e — credentials verification
+        entry: bash -c 'cd e2e-tests && node verify-credentials.cjs'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.env$'
+
+      - id: backend-fixture-enforcement
+        name: backend — enforce migration-based fixtures
+        entry: bash -c './.hooks/enforce-migration-fixtures.sh'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*/fixtures/.*\.json$'
+
+  # ========================================================================
+  # PHASE 10: Duplication Checks (80-90 sec)
+  # ========================================================================
+  # Run after formatting to ensure accurate duplicate detection
+      - id: jscpd-frontend-e2e
+        name: shared — duplication check (frontend + e2e)
+        entry: bash -c './frontend/node_modules/.bin/jscpd --config .jscpdrc frontend/src e2e-tests/tests'
+        language: system
+        pass_filenames: false
+        files: '^(frontend/src|e2e-tests/tests)/.*\.(ts|tsx|js)$'
+
+      - id: e2e-jscpd
+        name: e2e — duplication check
+        entry: bash -c './frontend/node_modules/.bin/jscpd --threshold 0 --gitignore e2e-tests/tests'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/tests/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 11: Test Markers + Coverage (90-150 sec)
+  # ========================================================================
+  # Run tests after code quality validated
+      - id: backend-tdd-markers
+        name: backend — tdd markers enforcement
+        entry: bash -c 'STAGED_TESTS=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null | grep -E "^backend/.*test.*\.py$" || true); if [ -n "$STAGED_TESTS" ]; then backend/.venv/bin/python ./.hooks/backend-tdd-tags.py $STAGED_TESTS; fi'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*test.*\.py$'
+
+      - id: backend-pytest-coverage
+        name: backend — test coverage (90% min)
+        entry: bash -c 'cd backend && ./.venv/bin/pytest --cov=. --cov-report=term-missing:skip-covered --cov-fail-under=90 --cov-branch -q'
+        language: system
+        pass_filenames: false
+        files: '^backend/.*\.py$'
+
+      - id: frontend-vitest-coverage
+        name: frontend — test coverage (90%)
+        entry: bash -c 'cd frontend && ./node_modules/.bin/vitest run --coverage --coverage.all'
+        language: system
+        pass_filenames: false
+        files: '^frontend/src/.*\.(ts|tsx)$'
+
+  # ========================================================================
+  # PHASE 12: Build Verification (150-180 sec)
+  # ========================================================================
+  # Run build after tests pass (expensive, mostly last)
+      - id: frontend-vite-build
+        name: frontend — production build
+        entry: bash -c 'cd frontend && ./node_modules/.bin/vite build --mode production'
+        language: system
+        pass_filenames: false
+        files: '^frontend/.*\.(ts|tsx|css|html)$'
+
+  # ========================================================================
+  # PHASE 13: E2E Tests (180-240 sec)
+  # ========================================================================
+  # Run E2E tests absolutely last (slowest, most expensive)
+      - id: e2e-playwright
+        name: e2e — playwright tests
+        entry: bash -c 'cd e2e-tests && ./node_modules/.bin/playwright test --max-failures=1'
+        language: system
+        pass_filenames: false
+        files: '^e2e-tests/.*\.(ts|tsx)$'

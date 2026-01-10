@@ -1,0 +1,29 @@
+{
+  "name": "shared-v3",
+  "type": "shared",
+  "display_name": "Shared V3 (p26f mirror)",
+  "description": "100% atomic mirror of p26f quality infrastructure",
+  "detection": { "always": false },
+  "dependencies": {
+    "system": ["git"],
+    "external": ["gitleaks"]
+  },
+  "installation": {
+    "config_copies": [
+      { "source": "configs/.pre-commit-config.yaml", "target": ".pre-commit-config.yaml" },
+      { "source": "configs/.gitleaks.toml", "target": ".gitleaks.toml" },
+      { "source": "configs/.jscpdrc", "target": ".jscpdrc" },
+      { "source": "configs/semgrep-backend.yml", "target": ".semgrep/backend.yml" },
+      { "source": "configs/semgrep-frontend.yml", "target": ".semgrep/frontend.yml" },
+      { "source": "configs/semgrep-e2e.yml", "target": ".semgrep/e2e.yml" }
+    ]
+  },
+  "hooks": [
+    "hooks/check-bypass-directives.sh",
+    "hooks/backend-max-lines.sh",
+    "hooks/frontend-max-lines.sh",
+    "hooks/backend-tdd-tags.py",
+    "hooks/enforce-migration-fixtures.sh"
+  ],
+  "variables": {}
+}

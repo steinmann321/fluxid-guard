@@ -1,0 +1,7 @@
+title = "p26f gitleaks config"
+
+[allowlist]
+description = "Allowlist local dev files"
+paths = [
+  "e2e-tests/test-results/"
+]

@@ -1,0 +1,26 @@
+{
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "@vitest/ui": "^2.1.8",
+    "dependency-cruiser": "^16.5.0",
+    "depcheck": "^1.4.7",
+    "eslint": "^9.17.0",
+    "jscpd": "^4.0.5",
+    "jsdom": "^25.0.1",
+    "knip": "^5.39.2",
+    "prettier": "^3.4.2",
+    "prettier-plugin-organize-imports": "^4.1.0",
+    "prettier-plugin-tailwindcss": "^0.6.9",
+    "stylelint": "^16.11.0",
+    "stylelint-config-standard": "^36.0.1",
+    "ts-unused-exports": "^10.1.0",
+    "type-coverage": "^2.29.1",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "vitest-axe": "^1.0.0"
+  }
+}
