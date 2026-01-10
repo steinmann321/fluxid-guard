@@ -8,14 +8,16 @@ QA automation built on pre-commit framework, designed for full-stack Django + Re
 
 ## Quick Start
 
-Install all quality checks in one command:
+Install fluxid-guard into any project:
 
 ```bash
-# In your Django + React + Playwright project
-make guard PRESET=django-react-playwright-v2
+# Clone and install in one step
+git clone https://github.com/steinmann321/fluxid-guard.git /tmp/fluxid-guard
+cd /tmp/fluxid-guard
+./install.sh /path/to/your/project --preset django-react-playwright-v2
 ```
 
-The guard system installs 49+ quality rules with automatic dependency management.
+The installer adds 49 hooks with automatic dependency management to your project.
 
 ---
 
@@ -165,7 +167,37 @@ your-project/
 
 ## Installation
 
-### Step 1: Add Guard Target to Makefile
+### Method 1: Direct Installation (Recommended)
+
+Install fluxid-guard into any existing project:
+
+```bash
+# 1. Ensure your project dependencies are installed first
+cd /path/to/your/project
+# Install backend dependencies (creates backend/.venv)
+# Install frontend dependencies (creates frontend/node_modules)
+# Install e2e dependencies (creates e2e-tests/node_modules)
+
+# 2. Clone fluxid-guard and run installer
+git clone https://github.com/steinmann321/fluxid-guard.git /tmp/fluxid-guard
+cd /tmp/fluxid-guard
+./install.sh /path/to/your/project --preset django-react-playwright-v2
+
+# 3. Cleanup (optional)
+rm -rf /tmp/fluxid-guard
+```
+
+**What the installer does:**
+1. Detects your project structure (backend, frontend, e2e-tests)
+2. Installs QA dependencies into existing `backend/.venv`
+3. Installs frontend/E2E QA dependencies to `node_modules`
+4. Copies pre-commit config (`.pre-commit-config.yaml`)
+5. Copies security configs (`.gitleaks.toml`, `.jscpdrc`, `.semgrep/`)
+6. Installs pre-commit hooks into your Git repository
+
+### Method 2: Makefile Integration (Optional)
+
+For convenience, add a `guard` target to your project's Makefile:
 
 ```makefile
 # fluxid guard configuration
@@ -188,27 +220,10 @@ guard:
 		echo "[MAKE] fluxid guard installation complete"
 ```
 
-### Step 2: Install Dependencies
-
+Then install with:
 ```bash
-# Install your app dependencies first
-make setup  # or npm install, pip install, etc.
-```
-
-### Step 3: Install Guard System
-
-```bash
-# Install all QA rules (one command, fully automated)
 make guard PRESET=django-react-playwright-v2
 ```
-
-**What happens:**
-1. Clones fluxid-guard from GitHub to temporary directory
-2. Installs 100+ Python QA dependencies to `backend/.venv`
-3. Installs frontend/E2E QA dependencies to `node_modules`
-4. Configures pre-commit hooks (`.pre-commit-config.yaml`)
-5. Sets up configs (`.gitleaks.toml`, `.jscpdrc`, `.semgrep/`)
-6. Cleans up temporary files
 
 ---
 
@@ -347,14 +362,21 @@ e2e-tests/node_modules/   # E2E QA tools
 
 ## Re-installation / Updates
 
+The installer automatically handles cleanup and reconfiguration. Simply run the installer again:
+
 ```bash
-# Update to latest version
+# Direct installation method
+git clone https://github.com/steinmann321/fluxid-guard.git /tmp/fluxid-guard
+cd /tmp/fluxid-guard
+./install.sh /path/to/your/project --preset django-react-playwright-v2
+
+# OR using Makefile (if integrated)
 make guard PRESET=django-react-playwright-v2
+```
 
-# Switch to different preset
-make guard PRESET=django-only
-
-# The installer handles cleanup and reconfiguration automatically
+To switch presets, just specify a different preset:
+```bash
+./install.sh /path/to/your/project --preset django-only
 ```
 
 ---
