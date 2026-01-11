@@ -139,9 +139,11 @@ your-project/
 │   └── enforce-migration-fixtures.sh
 └── .semgrep/                  # Constants enforcement rules
     ├── backend.yml
-    ├── frontend.yml
+    ├── frontend.yml            # Includes test ID enforcement
     └── e2e.yml
 ```
+
+**Note**: Frontend projects need to create `src/constants/testIds.ts` for test ID constants enforcement. See `template/constants-testIds.ts.example` in this repo for reference pattern.
 
 ## Validation Phases
 
@@ -223,7 +225,8 @@ Unlike typical pre-commit setups, fluxid guard uses `always_run: true` on critic
 ### 2. Smart Exclusions
 
 #### Frontend (React/TypeScript)
-- JSX attributes (`className`, `data-testid`)
+- JSX attributes (`className`, `style`, `aria-*`) - **except test IDs**
+- Test IDs (`data-testid`) - **enforced to use constants**
 - TypeScript type literals
 - i18n translation keys (`t("...")`)
 - Test framework descriptions (`describe`, `it`, `test`)
@@ -269,6 +272,31 @@ import { API_URL } from "@/constants";
 // ✅ Framework patterns (excluded)
 <Button className="btn-primary" />  // OK
 describe("Button component", () => ...)  // OK
+```
+
+**Frontend Test IDs** (enforced separately):
+```typescript
+// ❌ Hardcoded test IDs
+<Button data-testid="login-button">Login</Button>
+screen.getByTestId("login-button")
+
+// ✅ Test ID constants
+// src/constants/testIds.ts
+export const TEST_IDS = {
+  LOGIN_BUTTON: "login-button",
+  LOGOUT_BUTTON: "logout-button",
+} as const;
+
+// Component
+import { TEST_IDS } from "@/constants/testIds";
+<Button data-testid={TEST_IDS.LOGIN_BUTTON}>Login</Button>
+
+// Test
+import { TEST_IDS } from "@/constants/testIds";
+screen.getByTestId(TEST_IDS.LOGIN_BUTTON)
+
+// ✅ Dynamic test IDs (allowed)
+<div data-testid={`user-${userId}-card`}>  // OK
 ```
 
 **E2E**:

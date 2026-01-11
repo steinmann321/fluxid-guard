@@ -60,6 +60,35 @@ rules:
         - /frontend/src/**/constants/**
         - /frontend/src/constants/**
 
+  # Test ID constants enforcement
+  - id: frontend-enforce-testid-constants
+    languages: [javascript, typescript]
+    message: "data-testid requires constant. Create src/constants/testIds.ts: export const TEST_IDS={NAME:'value'}; Import and use: data-testid={TEST_IDS.NAME}"
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          # Catch string literals in data-testid
+          - pattern: data-testid="..."
+          - pattern: data-testid='...'
+          - pattern: |
+              data-testid={"..."}
+          - pattern: |
+              data-testid={'...'}
+      # Allow variables/constants (not literals)
+      - pattern-not-inside: |
+          data-testid={$VAR}
+      # Allow template literals with interpolation (dynamic test IDs)
+      - pattern-not-inside: |
+          data-testid={`${...}...`}
+      - pattern-not-inside: |
+          data-testid={`...${...}`}
+    paths:
+      include:
+        - /{{FRONTEND_DIR}}/src/**
+      exclude:
+        - /{{FRONTEND_DIR}}/src/**/constants/**
+        - /{{FRONTEND_DIR}}/src/constants/**
+
   # Shared JavaScript/TypeScript security rules
   - id: no-eval
     languages: [javascript, typescript]

@@ -1,0 +1,52 @@
+/**
+ * Test ID Constants - Reference Template
+ *
+ * Purpose: Centralize test IDs for consistency between components and tests
+ * Location: Copy to frontend/src/constants/testIds.ts in your project
+ *
+ * Benefits:
+ * - Single source of truth for test IDs
+ * - Type safety and autocomplete
+ * - Refactoring safety (rename propagates)
+ * - Easy to audit all test identifiers
+ */
+
+// Pattern: Group by feature or component
+export const AUTH_TEST_IDS = {
+  LOGIN_BUTTON: "auth-login-button",
+  LOGOUT_BUTTON: "auth-logout-button",
+  EMAIL_INPUT: "auth-email-input",
+  PASSWORD_INPUT: "auth-password-input",
+  ERROR_MESSAGE: "auth-error-message",
+} as const;
+
+export const PROFILE_TEST_IDS = {
+  AVATAR: "profile-avatar",
+  NAME_INPUT: "profile-name-input",
+  SAVE_BUTTON: "profile-save-button",
+  CANCEL_BUTTON: "profile-cancel-button",
+} as const;
+
+// Export unified constant for convenience
+export const TEST_IDS = {
+  ...AUTH_TEST_IDS,
+  ...PROFILE_TEST_IDS,
+} as const;
+
+// Type for strict typing in components
+export type TestId = typeof TEST_IDS[keyof typeof TEST_IDS];
+
+/**
+ * Usage in Components:
+ *
+ * import { TEST_IDS } from "@/constants/testIds";
+ *
+ * <button data-testid={TEST_IDS.LOGIN_BUTTON}>Login</button>
+ *
+ * Usage in Tests:
+ *
+ * import { screen } from "@testing-library/react";
+ * import { TEST_IDS } from "@/constants/testIds";
+ *
+ * expect(screen.getByTestId(TEST_IDS.LOGIN_BUTTON)).toBeInTheDocument();
+ */
