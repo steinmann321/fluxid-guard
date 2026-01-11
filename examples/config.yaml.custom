@@ -1,0 +1,9 @@
+# fluxid guard Configuration - Custom Layout Example
+# Adjust paths to match your project structure
+
+paths:
+  backend: "server"
+  frontend: "client"
+  e2e: "tests/e2e"
+  hooks: ".hooks"
+  semgrep: ".semgrep"

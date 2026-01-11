@@ -1,0 +1,24 @@
+{
+  "threshold": 0,
+  "reporters": ["console"],
+  "output": ".tmp/jscpd-reports",
+  "ignore": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/test-results/**",
+    "**/.tmp/**",
+    "**/migrations/**",
+    "frontend/src/app/components/ui/**",
+    "frontend/src/pages/TrainerPage.test.tsx",
+    ".claude/commands/**",
+    ".fluxid/commands/**",
+    ".fluxid/**",
+    ".claude/**",
+    "AGENTS.md",
+    "CLAUDE.md"
+  ],
+  "comment": "ui/** exception: Contains copied shadcn component library code (external, not custom); *Tab/**/*.test.ts: Standard test patterns (arrange-act-assert) across many test cases with similar setup/teardown; m03-e01/m03-e02: Shared E2E test setup patterns (imports and helper calls)"
+}

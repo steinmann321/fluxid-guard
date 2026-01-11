@@ -1,0 +1,9 @@
+# fluxid guard Configuration - Monorepo Layout Example
+# For projects with nested service structure
+
+paths:
+  backend: "services/api"
+  frontend: "packages/web"
+  e2e: "packages/e2e-tests"
+  hooks: ".hooks"
+  semgrep: ".semgrep"

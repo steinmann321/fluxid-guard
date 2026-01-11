@@ -1,0 +1,9 @@
+# fluxid guard Configuration - Default Layout
+# Use this for standard Django + React + Playwright projects
+
+paths:
+  backend: "backend"
+  frontend: "frontend"
+  e2e: "e2e-tests"
+  hooks: ".hooks"
+  semgrep: ".semgrep"

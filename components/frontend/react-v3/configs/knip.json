@@ -1,6 +1,0 @@
-{
-  "ignoreDependencies": ["react-router-dom"],
-  "ignoreExportsUsedInFile": true,
-  "entry": ["src/main.tsx"],
-  "project": ["src/**/*.{ts,tsx}"]
-}

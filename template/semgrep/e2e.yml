@@ -1,0 +1,196 @@
+rules:
+  # E2E numeric constants enforcement
+  - id: e2e-enforce-numeric-constants
+    languages: [javascript, typescript]
+    message: "Use constants for numbers. Put all test constants in e2e-tests/constants/ package only."
+    severity: ERROR
+    patterns:
+      - pattern: $N
+      - metavariable-regex:
+          metavariable: $N
+          regex: '^(?!-?1$|0$)(?:-?[0-9]+(?:\.[0-9]+)?)$'
+    paths:
+      include:
+        - /e2e-tests/**
+      exclude:
+        - /e2e-tests/constants/**
+
+  # E2E string constants enforcement
+  - id: e2e-enforce-string-constants
+    languages: [javascript, typescript]
+    message: "Use constants for strings. Put all test constants in e2e-tests/constants/ package only."
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          # String assignments
+          - pattern: $VAR = "$S"
+          - pattern: $VAR = '$S'
+          # String returns
+          - pattern: return "$S"
+          - pattern: return '$S'
+          # Function arguments with strings
+          - pattern: $F(..., "$S", ...)
+          - pattern: $F(..., '$S', ...)
+      # Exclude test framework function NAMES (but not test data inside)
+      - pattern-not-inside: test("...", ...)
+      - pattern-not-inside: test.describe("...", ...)
+      - pattern-not-inside: test.beforeEach("...", ...)
+      - pattern-not-inside: test.afterEach("...", ...)
+      - pattern-not-inside: test.beforeAll("...", ...)
+      - pattern-not-inside: test.afterAll("...", ...)
+      # Exclude Playwright locators and selectors (these are test infrastructure, not data)
+      - pattern-not-inside: page.locator("...")
+      - pattern-not-inside: page.getByRole("...", ...)
+      - pattern-not-inside: page.getByTestId("...")
+      - pattern-not-inside: page.getByText("...")
+      - pattern-not-inside: page.getByLabel("...")
+      - pattern-not-inside: page.getByPlaceholder("...")
+      - pattern-not-inside: page.waitForSelector("...")
+      # Exclude console logging
+      - pattern-not-inside: console.log("...")
+      - pattern-not-inside: console.error("...")
+      - pattern-not-inside: console.warn("...")
+      - pattern-not-inside: console.info("...")
+      - pattern-not-inside: console.debug("...")
+    paths:
+      include:
+        - /e2e-tests/**
+      exclude:
+        - /e2e-tests/constants/**
+
+  # Shared JavaScript/TypeScript security rules
+  - id: no-eval
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: eval($X)
+    message: Avoid eval; use safe alternatives.
+    severity: ERROR
+
+  - id: no-new-function
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: new Function($ARGS)
+    message: Avoid dynamic Function constructors.
+    severity: ERROR
+
+  - id: no-child-process
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+          - pattern: require('child_process').$METHOD(...)
+          - pattern: import 'child_process'
+    message: Avoid child_process in repo code.
+    severity: ERROR
+
+  # Playwright strict rules
+  - id: playwright-ban-wait-for-timeout
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.waitForTimeout($DURATION)
+    message: Avoid waitForTimeout; use locator waits + expect.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: playwright-ban-page-pause
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.pause()
+    message: Avoid page.pause in committed tests.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: playwright-discourage-raw-screenshot
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: await page.screenshot($ARGS)
+    message: Use captureScreen(...) helper for consistency.
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  # Black-box E2E enforcement: ban non-UI APIs (no URL reliance)
+  - id: e2e-ban-playwright-request
+    languages: [typescript, javascript]
+    patterns:
+      - pattern-either:
+        - pattern: page.request.get($X)
+        - pattern: page.request.post($X)
+        - pattern: page.request.put($X)
+        - pattern: page.request.delete($X)
+        - pattern: page.request.fetch($X)
+        - pattern: request.get($X)
+        - pattern: request.post($X)
+        - pattern: request.put($X)
+        - pattern: request.delete($X)
+        - pattern: request.fetch($X)
+    message: "Black-box E2E: do not use Playwright request APIs."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-fetch-global
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: fetch($X)
+    message: "Black-box E2E: do not use global fetch."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-axios-http
+    languages: [typescript, typescript]
+    patterns:
+      - pattern-either:
+        - pattern: axios($X)
+        - pattern: axios.get($X)
+        - pattern: axios.post($X)
+        - pattern: axios.put($X)
+        - pattern: axios.delete($X)
+    message: "Black-box E2E: do not use axios."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-programmatic-navigation
+    languages: [typescript, javascript]
+    patterns:
+      - pattern: page.goto($X)
+    message: "Black-box E2E: do not use programmatic navigation; navigate via UI."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  - id: e2e-ban-network-stubbing
+    languages: [typescript, javascript]
+    patterns:
+      - pattern-either:
+        - pattern: page.route($X)
+        - pattern: context.route($X)
+    message: "Black-box E2E: do not use programmatic network stubbing."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**
+
+  # Optional cross-framework bans to keep config stack-agnostic
+  - id: e2e-ban-cypress-request-visit
+    languages: [javascript, typescript]
+    patterns:
+      - pattern-either:
+        - pattern: cy.request($X)
+        - pattern: cy.visit($X)
+        - pattern: cy.intercept($X)
+    message: "Black-box E2E: do not use Cypress request/visit/intercept."
+    severity: ERROR
+    paths:
+      include:
+        - /e2e-tests/tests/**

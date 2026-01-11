@@ -1,96 +1,31 @@
+# MacOS
+.DS_Store
+._*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
 # Python
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.venv/
-venv/
-ENV/
-env/
+dist/
+build/
 
 # Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-.pnpm-debug.log*
 
-# Testing
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.nox/
-coverage/
-*.cover
-.hypothesis/
-.vitest/
-playwright-report/
-test-results/
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-
-# Logs
-*.log
-logs/
-*.pid
-*.seed
-*.pid.lock
-
-# Temporary files
-.tmp/
-tmp/
-temp/
+# Temp files
 *.tmp
-
-# Backups
-.hooks-backup-*/
-*.backup
 *.bak
-
-# Build outputs
-dist/
-build/
-
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# Cache directories
-.mypy_cache/
-.ruff_cache/
-.eslintcache
-.stylelintcache
-
-# Test databases
-*.sqlite3
-db.sqlite3
-
-# OS files
-Thumbs.db
-.DS_Store
+*.log

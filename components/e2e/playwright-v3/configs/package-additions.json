@@ -1,9 +1,0 @@
-{
-  "devDependencies": {
-    "@playwright/test": "^1.49.1",
-    "@types/node": "^22.10.2",
-    "eslint": "^9.17.0",
-    "type-coverage": "^2.29.1",
-    "typescript": "^5.7.2"
-  }
-}

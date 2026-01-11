@@ -1,5 +1,0 @@
-{
-  "threshold": 2,
-  "reporters": [],
-  "ignore": ["**/node_modules/**", "**/dist/**", "**/build/**", "**/.venv/**", "**/venv/**", "**/coverage/**", "**/.tmp/**", "**/e2e-tests/test-results/**"]
-}

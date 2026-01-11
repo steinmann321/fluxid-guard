@@ -1,0 +1,126 @@
+rules:
+  # Backend numeric constants enforcement
+  - id: backend-enforce-numeric-constants
+    languages: [python]
+    message: "Use constants for numbers. Put app-specific constants in backend/**/constants/ and shared constants in backend/constants/."
+    severity: ERROR
+    patterns:
+      - pattern: $N
+      - metavariable-regex:
+          metavariable: $N
+          regex: '^(?!-?1$|0$)(?:-?[0-9]+(?:\.[0-9]+)?)$'
+      # Allow common Django contexts where literals are expected
+      - pattern-not-inside: 'path("...", ... )'
+      - pattern-not-inside: 're_path("...", ... )'
+      - pattern-not-inside: 'include("...")'
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            max_length=$N,
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            max_digits=$N,
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            decimal_places=$N,
+            ...
+          )
+    paths:
+      include:
+        - /backend/**
+      exclude:
+          - /backend/**/constants/**
+          - /backend/constants/**
+          - /backend/**/migrations/**
+
+  # Backend string constants enforcement
+  - id: backend-enforce-string-constants
+    languages: [python]
+    message: "Use constants for strings. Put app-specific constants in backend/**/constants/ and shared constants in backend/constants/."
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          # String assignments
+          - pattern: $VAR = "$S"
+          - pattern: $VAR = '$S'
+          # String returns
+          - pattern: return "$S"
+          - pattern: return '$S'
+          # Function arguments with strings
+          - pattern: $F(..., "$S", ...)
+          - pattern: $F(..., '$S', ...)
+          # Strings in dict literals passed to response/render helpers
+          - pattern: |
+              JsonResponse({...: "...", ...})
+          - pattern: |
+              Response({...: "...", ...})
+          - pattern: |
+              HttpResponse({...: "...", ...})
+          - pattern: |
+              render(..., ..., {...: "...", ...})
+      # Allow common Django contexts where literals are expected
+      - pattern-not-inside: 'path("...", ... )'
+      - pattern-not-inside: 're_path("...", ... )'
+      - pattern-not-inside: 'include("...")'
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            verbose_name="...",
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            help_text="...",
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            db_table="...",
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            upload_to="...",
+            ...
+          )
+      - pattern-not-inside: |
+          models.$FIELD(
+            ...,
+            related_name="...",
+            ...
+          )
+      # Allow logging and i18n wrappers
+      - pattern-not-inside: 'logging.$LEVEL("...")'
+      - pattern-not-inside: '$LOGGER.info("...")'
+      - pattern-not-inside: '$LOGGER.debug("...")'
+      - pattern-not-inside: '$LOGGER.error("...")'
+      - pattern-not-inside: '$LOGGER.exception("...")'
+      - pattern-not-inside: '$LOGGER.warning("...")'
+      - pattern-not-inside: '_("...")'
+      - pattern-not-inside: 'gettext("...")'
+      - pattern-not-inside: 'gettext_lazy("...")'
+      - pattern-not-inside: 'ngettext("...", "...", ...)'
+      # Allow Decimal literal strings, AppConfig.name, env bootstrap
+      - pattern-not-inside: 'Decimal("...")'
+      - pattern-not-inside: |
+          class $C(AppConfig):
+            ...
+            name = "..."
+            ...
+      - pattern-not-inside: 'os.environ.setdefault("...", "...")'
+    paths:
+      include:
+        - /backend/**
+      exclude:
+          - /backend/**/constants/**
+          - /backend/constants/**
+          - /backend/**/migrations/**
