@@ -128,9 +128,10 @@ After installation, your project will have:
 
 ```
 your-project/
-├── .pre-commit-config.yaml    # Main pre-commit configuration
-├── .gitleaks.toml             # Secrets detection rules
-├── .jscpdrc                   # Code duplication thresholds
+├── .pre-commit-config.yaml          # Main config (fail-fast enabled)
+├── .pre-commit-config-full.yaml     # Full run config (no fail-fast)
+├── .gitleaks.toml                   # Secrets detection rules
+├── .jscpdrc                         # Code duplication thresholds
 ├── .hooks/                    # Custom validation scripts
 │   ├── backend-max-lines.sh
 │   ├── frontend-max-lines.sh
@@ -142,6 +143,48 @@ your-project/
     ├── frontend.yml            # Includes test ID enforcement
     └── e2e.yml
 ```
+
+## Configuration Modes
+
+### Default: Fail-Fast (`.pre-commit-config.yaml`)
+**Use for:** Regular commits, day-to-day development
+
+Stops at first failure for quick feedback:
+```bash
+git commit  # Uses default config automatically
+```
+
+**Behavior:**
+- Stops immediately on first error
+- Fast feedback (10-30 seconds typical)
+- Developer-friendly iteration
+
+### Full Run Mode (`.pre-commit-config-full.yaml`)
+**Use for:** Initial audits, reporting, coverage tools, CI dashboards
+
+Runs all checks regardless of failures:
+```bash
+# One-time full audit
+SKIP= pre-commit run --all-files --config .pre-commit-config-full.yaml
+
+# See all violations across entire codebase
+pre-commit run --all-files --config .pre-commit-config-full.yaml 2>&1 | tee audit-report.txt
+
+# CI/CD full scan
+pre-commit run --all-files --config .pre-commit-config-full.yaml --show-diff-on-failure
+```
+
+**Behavior:**
+- Runs all 13 phases completely
+- Shows all violations (not just first)
+- Generates complete picture for metrics
+- Slower (3-5 minutes full run)
+
+**Use cases:**
+- Initial project audit: "Show me all current violations"
+- Coverage reports: "What's our overall compliance?"
+- CI metrics: Track violation trends over time
+- Documentation: Generate compliance reports
 
 ## Validation Phases
 
@@ -308,6 +351,31 @@ await page.fill("#username", TEST_USER_EMAIL);
 
 // ✅ Framework patterns (excluded)
 await page.getByRole("button", { name: "Submit" });  // OK
+```
+
+## Common Commands
+
+```bash
+# Regular commit (fail-fast, default)
+git commit -m "your message"
+
+# Full audit (see all violations)
+pre-commit run --all-files --config .pre-commit-config-full.yaml
+
+# Run specific hook
+pre-commit run backend-ruff-lint --all-files
+
+# Skip specific hook (emergency only)
+SKIP=backend-mypy git commit -m "wip"
+
+# Update all hooks to latest versions
+pre-commit autoupdate
+
+# Manually run hooks without committing
+pre-commit run --all-files
+
+# Generate audit report
+pre-commit run --all-files --config .pre-commit-config-full.yaml 2>&1 | tee quality-audit.txt
 ```
 
 ## Troubleshooting
