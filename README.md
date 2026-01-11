@@ -143,8 +143,6 @@ your-project/
     └── e2e.yml
 ```
 
-**Note**: Frontend projects need to create `src/constants/testIds.ts` for test ID constants enforcement. See `template/constants-testIds.ts.example` in this repo for reference pattern.
-
 ## Validation Phases
 
 fluxid guard runs 13 sequential phases designed to fail fast:
