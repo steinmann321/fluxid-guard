@@ -59,11 +59,10 @@ repos:
   # Process all projects together: {{BACKEND_DIR}} vulture/autoflake + frontend knip/unused-exports
       - id: backend-vulture
         name: {{BACKEND_DIR}} — dead code detection
-        entry: bash -c 'cd {{BACKEND_DIR}} && .venv/bin/vulture .'
+        entry: bash -c 'cd {{BACKEND_DIR}} && .venv/bin/vulture . --exclude "*/.venv/*,*/migrations/*,*/__pycache__/*,.venv,migrations,__pycache__"'
         language: system
         pass_filenames: false
         always_run: true
-        exclude: '^{{BACKEND_DIR}}/(\.venv|migrations|__pycache__)/'
 
       - id: backend-autoflake
         name: {{BACKEND_DIR}} — unused imports/variables
@@ -106,7 +105,7 @@ repos:
 
       - id: frontend-depcheck
         name: frontend — dependency hygiene
-        entry: bash -c 'cd {{FRONTEND_DIR}} && ./node_modules/.bin/depcheck --ignores "@tailwindcss/postcss,autoprefixer,dependency-cruiser,depcheck,eslint-formatter-unix,jscpd,jsdom,knip,postcss,prettier,prettier-plugin-organize-imports,prettier-plugin-tailwindcss,stylelint,stylelint-config-standard,tailwindcss,ts-unused-exports,type-coverage,vitest,vitest-axe,@vitest/ui,@vitest/coverage-v8,@testing-library/react,@testing-library/jest-dom,@testing-library/user-event,@typescript-eslint/eslint-plugin,@typescript-eslint/parser"'
+        entry: bash -c 'cd {{FRONTEND_DIR}} && ./node_modules/.bin/depcheck --ignores "@tailwindcss/postcss,autoprefixer,dependency-cruiser,depcheck,eslint,jscpd,jsdom,knip,postcss,prettier,prettier-plugin-organize-imports,prettier-plugin-tailwindcss,stylelint,stylelint-config-standard,tailwindcss,ts-unused-exports,type-coverage,typescript,vitest,@vitest/ui,@vitest/coverage-v8,@testing-library/react,@testing-library/jest-dom,@testing-library/user-event,@typescript-eslint/eslint-plugin,@typescript-eslint/parser"'
         language: system
         pass_filenames: false
         always_run: true
