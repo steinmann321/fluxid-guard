@@ -57,18 +57,13 @@ echo ""
 
 cd "$TARGET_DIR"
 
-# 1. Copy pre-commit configs with path substitution
-echo "[1/6] Installing pre-commit configurations..."
+# 1. Copy pre-commit config with path substitution
+echo "[1/6] Installing pre-commit configuration..."
 sed -e "s|{{BACKEND_DIR}}|$BACKEND_DIR|g" \
     -e "s|{{FRONTEND_DIR}}|$FRONTEND_DIR|g" \
     -e "s|{{E2E_DIR}}|$E2E_DIR|g" \
     "$SCRIPT_DIR/template/.pre-commit-config.yaml" > .pre-commit-config.yaml
-sed -e "s|{{BACKEND_DIR}}|$BACKEND_DIR|g" \
-    -e "s|{{FRONTEND_DIR}}|$FRONTEND_DIR|g" \
-    -e "s|{{E2E_DIR}}|$E2E_DIR|g" \
-    "$SCRIPT_DIR/template/.pre-commit-config-full.yaml" > .pre-commit-config-full.yaml
-echo "      ✓ .pre-commit-config.yaml (fail-fast)"
-echo "      ✓ .pre-commit-config-full.yaml (full run)"
+echo "      ✓ .pre-commit-config.yaml"
 
 # 2. Copy hook scripts
 echo "[2/6] Installing custom hooks..."

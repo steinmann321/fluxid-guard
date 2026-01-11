@@ -84,10 +84,10 @@ rules:
           data-testid={`...${...}`}
     paths:
       include:
-        - /{{FRONTEND_DIR}}/src/**
+        - /frontend/src/**
       exclude:
-        - /{{FRONTEND_DIR}}/src/**/constants/**
-        - /{{FRONTEND_DIR}}/src/constants/**
+        - /frontend/src/**/constants/**
+        - /frontend/src/constants/**
 
   # Shared JavaScript/TypeScript security rules
   - id: no-eval
