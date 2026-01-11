@@ -35,6 +35,10 @@ rules:
       include:
         - /backend/**
       exclude:
+          # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+          # - constants/**: Where constants are defined (literals expected by design)
+          # - migrations/**: Django auto-generated code (not user-controlled)
+          # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
           - /backend/**/constants/**
           - /backend/constants/**
           - /backend/**/migrations/**
@@ -121,6 +125,10 @@ rules:
       include:
         - /backend/**
       exclude:
+          # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+          # - constants/**: Where constants are defined (literals expected by design)
+          # - migrations/**: Django auto-generated code (not user-controlled)
+          # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
           - /backend/**/constants/**
           - /backend/constants/**
           - /backend/**/migrations/**

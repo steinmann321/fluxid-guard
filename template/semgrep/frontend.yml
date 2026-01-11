@@ -13,6 +13,9 @@ rules:
       include:
         - /frontend/src/**
       exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where constants are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /frontend/src/**/constants/**
         - /frontend/src/constants/**
 
@@ -57,6 +60,9 @@ rules:
       include:
         - /frontend/src/**
       exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where constants are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /frontend/src/**/constants/**
         - /frontend/src/constants/**
 
@@ -86,6 +92,9 @@ rules:
       include:
         - /frontend/src/**
       exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where constants are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /frontend/src/**/constants/**
         - /frontend/src/constants/**
 

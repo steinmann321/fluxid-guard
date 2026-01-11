@@ -13,6 +13,9 @@ rules:
       include:
         - /e2e-tests/**
       exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where constants are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /e2e-tests/constants/**
 
   # E2E string constants enforcement
@@ -56,6 +59,9 @@ rules:
       include:
         - /e2e-tests/**
       exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where constants are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /e2e-tests/constants/**
 
   # Shared JavaScript/TypeScript security rules

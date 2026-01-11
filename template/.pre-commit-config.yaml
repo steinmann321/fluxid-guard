@@ -59,6 +59,8 @@ repos:
   # Process all projects together: {{BACKEND_DIR}} vulture/autoflake + frontend knip/unused-exports
       - id: backend-vulture
         name: {{BACKEND_DIR}} — dead code detection
+        # Exclusions: .venv (dependencies), migrations (Django auto-generated), __pycache__ (bytecode)
+        # DO NOT ADD MORE - if code should not be checked, fix the root cause
         entry: bash -c 'cd {{BACKEND_DIR}} && .venv/bin/vulture . --exclude "*/.venv/*,*/migrations/*,*/__pycache__/*,.venv,migrations,__pycache__"'
         language: system
         pass_filenames: false
@@ -66,6 +68,8 @@ repos:
 
       - id: backend-autoflake
         name: {{BACKEND_DIR}} — unused imports/variables
+        # Exclusions: __pycache__ (bytecode), .venv (dependencies), migrations (Django auto-generated)
+        # DO NOT ADD MORE - if code should not be checked, fix the root cause
         entry: bash -c '{{BACKEND_DIR}}/.venv/bin/autoflake --check --recursive --remove-all-unused-imports --remove-unused-variables --exclude=__pycache__,.venv,migrations backend'
         language: system
         pass_filenames: false
@@ -80,6 +84,8 @@ repos:
 
       - id: frontend-ts-unused-exports
         name: frontend — unused exports check
+        # Exclusions: src/main.tsx (application entry point - exports consumed by build system)
+        # DO NOT ADD MORE - if exports appear unused, they likely are and should be removed
         entry: bash -c 'cd {{FRONTEND_DIR}} && ./node_modules/.bin/ts-unused-exports tsconfig.app.json --showLineNumber --exitWithCount --excludePathsFromReport="src/main.tsx"'
         language: system
         pass_filenames: false
@@ -116,6 +122,8 @@ repos:
   # Quick structural checks before expensive analysis
       - id: backend-max-lines
         name: {{BACKEND_DIR}} — max lines (400 prod, 600 tests)
+        # Exclusions: migrations/ (Django auto-generated - not user code)
+        # DO NOT ADD MORE - if file is too long, refactor it
         entry: bash -c './.hooks/backend-max-lines.sh'
         language: system
         pass_filenames: false
@@ -241,6 +249,8 @@ repos:
   # Structural analysis after type checking validates structure
       - id: backend-xenon
         name: {{BACKEND_DIR}} — complexity check
+        # Exclusions: .venv (dependencies), migrations (Django auto-generated)
+        # DO NOT ADD MORE - if code is too complex, refactor it
         entry: bash -c '{{BACKEND_DIR}}/.venv/bin/xenon --max-absolute B --max-modules B --max-average A --exclude {{BACKEND_DIR}}/.venv,backend/migrations backend'
         language: system
         pass_filenames: false
@@ -280,6 +290,8 @@ repos:
 
       - id: backend-bandit
         name: {{BACKEND_DIR}} — security scan
+        # Exclusions: .venv (dependencies - not user code)
+        # DO NOT ADD MORE - if code has security issues, fix them
         entry: bash -c '{{BACKEND_DIR}}/.venv/bin/bandit -r {{BACKEND_DIR}} -ll --exclude {{BACKEND_DIR}}/.venv'
         language: system
         pass_filenames: false

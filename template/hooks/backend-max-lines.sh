@@ -2,6 +2,14 @@
 set -euo pipefail
 
 # Backend max lines: 400 prod, 600 tests
+#
+# Exclusions (technical only - NOT user code):
+# - migrations/ : Django auto-generated
+# - __pycache__/ : Python bytecode
+# - .* : Hidden files (not source code)
+#
+# DO NOT ADD MORE EXCLUSIONS - if file is too long, refactor it
+# Test files get higher limit (600 vs 400) but still enforced
 
 FILES=$(find backend -type f -name '*.py' -not -path '*/.*' -not -path '*/migrations/*' -not -path '*/__pycache__/*')
 

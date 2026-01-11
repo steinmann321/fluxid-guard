@@ -2,7 +2,11 @@
 set -euo pipefail
 
 # Enforce hard caps on lines for ALL files in frontend/src
-# Production code: 400 lines; Test files: 600 lines.
+# Production code: 400 lines; Test files: 600 lines
+#
+# NO EXCLUSIONS - all source files are checked
+# Test files get higher limit (600 vs 400) but still enforced
+# If file is too long, refactor it - no exceptions allowed
 
 PROD_LIMIT=400
 TEST_LIMIT=600
