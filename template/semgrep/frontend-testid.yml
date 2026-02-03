@@ -1,0 +1,21 @@
+rules:
+  # Frontend test ID usage and constants enforcement
+  - id: frontend-enforce-testid-constants
+    languages: [javascript, typescript]
+    message: "data-testid requires constant. Use a shared TEST_IDS constant and set data-testid={TEST_IDS.NAME}."
+    severity: ERROR
+    patterns:
+      # Match any literal string used as data-testid attribute in JSX opening tag
+      - pattern: <$TAG data-testid="$ID" ...>...</$TAG>
+      - metavariable-regex:
+          metavariable: $ID
+          regex: ".+"
+    paths:
+      include:
+        - /frontend/src/**
+      exclude:
+        # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
+        # - constants/**: Where test IDs are defined (literals expected by design)
+        # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
+        - /frontend/src/**/constants/**
+        - /frontend/src/constants/**

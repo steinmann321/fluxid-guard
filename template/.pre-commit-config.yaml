@@ -156,8 +156,8 @@ repos:
         always_run: true
 
       - id: semgrep-frontend
-        name: frontend — constants enforcement
-        entry: bash -c '{{BACKEND_DIR}}/.venv/bin/semgrep scan --config .semgrep/frontend.yml {{FRONTEND_DIR}}/src --error'
+        name: frontend — constants + test ID enforcement
+        entry: bash -c '{{BACKEND_DIR}}/.venv/bin/semgrep scan --config .semgrep/frontend-testid.yml {{FRONTEND_DIR}}/src --error && {{BACKEND_DIR}}/.venv/bin/semgrep scan --config .semgrep/frontend.yml {{FRONTEND_DIR}}/src --error'
         language: system
         pass_filenames: false
         always_run: true

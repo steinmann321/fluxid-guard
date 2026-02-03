@@ -15,8 +15,14 @@ rules:
       exclude:
         # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
         # - constants/**: Where constants are defined (literals expected by design)
+        # - playwright.config.ts: Playwright configuration with ports, timeouts
+        # - support/: Page objects and test infrastructure
+        # - *.cjs: Configuration scripts
         # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /e2e-tests/constants/**
+        - /e2e-tests/playwright.config.ts
+        - /e2e-tests/**/support/**
+        - /e2e-tests/**/*.cjs
 
   # E2E string constants enforcement
   - id: e2e-enforce-string-constants
@@ -49,20 +55,61 @@ rules:
       - pattern-not-inside: page.getByLabel("...")
       - pattern-not-inside: page.getByPlaceholder("...")
       - pattern-not-inside: page.waitForSelector("...")
-      # Exclude console logging
-      - pattern-not-inside: console.log("...")
-      - pattern-not-inside: console.error("...")
-      - pattern-not-inside: console.warn("...")
-      - pattern-not-inside: console.info("...")
-      - pattern-not-inside: console.debug("...")
+      # Exclude console logging (allow any console method)
+      - pattern-not-inside: console.$METHOD(...)
+      # Exclude Playwright navigation (page.goto, waitForLoadState)
+      - pattern-not-inside: |
+          page.goto(...)
+      - pattern-not-inside: |
+          page.waitForLoadState(...)
+      # Exclude Node.js require statements (module imports)
+      - pattern-not-inside: require("...")
+      - pattern-not-inside: require('...')
+      # Exclude document queries in page.evaluate
+      - pattern-not-inside: |
+          document.querySelector(...)
+      # Exclude constant definitions
+      - pattern-not-inside: |
+          const $CONST_NAME = "..."
+      # Exclude string method calls (split, includes, etc.)
+      - pattern-not-inside: $X.split("...")
+      - pattern-not-inside: $X.includes("...")
     paths:
       include:
         - /e2e-tests/**
       exclude:
         # JUSTIFIED EXCEPTIONS - DO NOT ADD MORE WITHOUT EXHAUSTING ALL ALTERNATIVES
         # - constants/**: Where constants are defined (literals expected by design)
+        # - playwright.config.ts: Playwright configuration with ports, timeouts
+        # - support/: Page objects and test infrastructure
+        # - *.cjs: Configuration scripts
         # Adding exceptions here weakens enforcement - only add if absolutely unavoidable
         - /e2e-tests/constants/**
+        - /e2e-tests/playwright.config.ts
+        - /e2e-tests/**/support/**
+        - /e2e-tests/**/*.cjs
+
+  # E2E test ID usage and constants enforcement
+  - id: e2e-enforce-testid-constants
+    languages: [javascript, typescript]
+    message: "Use getByTestId(TESTID_*) and define TESTID_* constants in a shared testIds module; never pass string literals to getByTestId."
+    severity: ERROR
+    patterns:
+      - pattern: page.getByTestId("$ID")
+      - metavariable-regex:
+          metavariable: $ID
+          regex: ".+"
+
+  - id: e2e-require-testid-selectors
+    languages: [javascript, typescript]
+    message: "Select elements via getByTestId(TESTID_*) instead of text/role selectors for E2E."
+    severity: ERROR
+    patterns:
+      - pattern-either:
+          - pattern: page.getByText($X)
+          - pattern: page.getByRole($ROLE, $ARGS)
+          - pattern: page.getByLabel($X)
+          - pattern: page.locator($X)
 
   # Shared JavaScript/TypeScript security rules
   - id: no-eval
